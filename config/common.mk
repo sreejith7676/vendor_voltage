@@ -10,7 +10,6 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.com.android.dataroaming=false \
     ro.opa.eligible_device=true \
     ro.setupwizard.enterprise_mode=1 \
-    ro.storage_manager.enabled=true \
     ro.url.legal=http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html \
     ro.url.legal.android_privacy=http://www.google.com/intl/%s/mobile/android/basic/privacy.html
 
@@ -21,6 +20,20 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 else
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.com.google.clientidbase=$(PRODUCT_GMS_CLIENTID_BASE)
+endif
+
+ifeq ($(WITH_GMS),true)
+    DONT_DEXPREOPT_PREBUILTS := true
+endif
+
+ifeq ($(TARGET_BUILD_VARIANT), user)
+    PRODUCT_SYSTEM_SERVER_DEBUG_INFO := false
+    PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD := false
+endif
+
+ifeq ($(WITH_GMS),false)
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.storage_manager.enabled=true
 endif
 
 # Exclude repos from bp scanning
@@ -54,7 +67,7 @@ PRODUCT_PRODUCT_PROPERTIES += is_expressive_design_enabled=true
 # Backup Tool
 PRODUCT_COPY_FILES += \
     vendor/voltage/prebuilt/common/bin/backuptool.sh:install/bin/backuptool.sh \
-    vendor/voltage/prebuilt/common/bin/backuptool.functions:install/bin/backuptool.functions \
+    vendor/voltage/prebuilt/common/bin/backuptool.functions:install/bin/backuptool.functions
 
 ifneq ($(strip $(AB_OTA_PARTITIONS) $(AB_OTA_POSTINSTALL_CONFIG)),)
 PRODUCT_COPY_FILES += \
@@ -86,9 +99,13 @@ endif
 
 # Pixel features and C2S
 PRODUCT_COPY_FILES += \
-    vendor/voltage/prebuilt/common/etc/sysconfig/pixel_features.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/pixel_features.xml \
+    vendor/voltage/prebuilt/common/etc/sysconfig/pixel_features.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/pixel_features.xml
+
+ifneq ($(WITH_GMS),true)
+PRODUCT_COPY_FILES += \
     vendor/voltage/prebuilt/common/etc/sysconfig/contextual_search.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/contextual_search.xml \
     vendor/voltage/prebuilt/common/etc/sysconfig/nga.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/nga.xml
+endif
 
 # Copy all VOLTAGE-specific init rc files
 $(foreach f,$(wildcard vendor/voltage/prebuilt/common/etc/init/*.rc),\
@@ -159,10 +176,6 @@ $(call enforce-product-packages-exist-internal,$(wildcard device/*/$(VOLTAGE_BUI
 SYSTEM_OPTIMIZE_JAVA ?= true
 SYSTEMUI_OPTIMIZE_JAVA ?= true
 FULL_SYSTEM_OPTIMIZE_JAVA ?= true
-
-# Storage manager
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.storage_manager.enabled=true
 
 # These packages are excluded from user builds
 PRODUCT_PACKAGES_DEBUG += \

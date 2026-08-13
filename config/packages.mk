@@ -1,25 +1,30 @@
-# VoltageOS packages
+# VoltageOS packages (Keep these always)
 PRODUCT_PACKAGES += \
     SimpleDeviceConfig \
     Covers \
-    Etar \
     ThemePicker \
-    AvatarPicker \
     ThemesStub \
-    Jellyfish \
     LogViewer \
-    Gramophone \
     GameSpace \
-    VoltageSetupWizard \
-    Seedvault \
     Datura \
-    ExactCalculator \
-    Glimpse \
     LMOFreeform \
     LMOFreeformSidebar \
     OmniJaws \
-    AppCompatConfig \
-    AppDataBackup
+    AppCompatConfig
+
+# Apps with Google equivalents — skip on GMS builds
+ifneq ($(WITH_GMS),true)
+PRODUCT_PACKAGES += \
+    AvatarPicker \
+    Etar \
+    ExactCalculator \
+    Glimpse \
+    VoltageSetupWizard \
+    Seedvault \
+    AppDataBackup \
+    Gramophone  \
+    Jellyfish 
+endif
 
 ifeq ($(VOLTAGE_BUILD_TYPE),OFFICIAL)
     PRODUCT_PACKAGES += \

@@ -15,6 +15,14 @@
 ANDROID_VERSION := 17
 VOLTAGEVERSION := 6.0
 
+# GMS
+ifeq ($(WITH_GMS),true)
+    $(call inherit-product, vendor/gapps/arm64/arm64-vendor.mk)
+    VOLTAGE_PACKAGE_TYPE := GAPPS
+else
+    VOLTAGE_PACKAGE_TYPE := VANILLA
+endif
+
 VOLTAGE_BUILD_TYPE ?= UNOFFICIAL
 VOLTAGE_GPG_KEY :=
 VOLTAGE_GPG_UID :=
@@ -105,5 +113,6 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
   ro.voltage.device=$(VOLTAGE_BUILD) \
   ro.voltage.platform_release_or_codename=$(VOLTAGE_PLATFORM_RELEASE_OR_CODENAME) \
   org.voltage.version=$(VOLTAGEVERSION) \
+  ro.voltage.packagetype=$(VOLTAGE_PACKAGE_TYPE) \
   ro.voltage.maintainer.gpg_key=$(VOLTAGE_GPG_KEY) \
   ro.voltage.maintainer.gpg_uid="$(VOLTAGE_GPG_UID)"
